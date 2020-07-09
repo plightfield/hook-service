@@ -1,6 +1,6 @@
 {
   "name": "hook-service",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "main": "lib/index.js",
   "description": "handle logic with only ONE function",
   "keywords": [
