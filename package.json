@@ -2,7 +2,7 @@
   "name": "hook-service",
   "version": "1.3.6",
   "main": "lib/index.js",
-  "description": "handle logic in one place just use hooks",
+  "description": "handle logic with only ONE function",
   "keywords": [
     "React",
     "hooks",
@@ -14,6 +14,10 @@
   "private": false,
   "author": "plightfield",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plightfield/hook-service.git"
+  },
   "scripts": {
     "build": "tsc"
   },
