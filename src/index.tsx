@@ -37,7 +37,9 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
   // handle data much easier
   const useService = function () {
     const data = useContext(ServiceContext);
-    const get = useCallback((key: string) => getTargetByKey(data, key), [data]);
+    const get = useCallback((key: string) => getTargetByKey(data, key).value, [
+      data,
+    ]);
     const set = useCallback(
       (key: string, value: any) => {
         if (Object.prototype.toString.call(key) !== "[object String]") {
@@ -54,20 +56,33 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
         ) {
           throw new Error("setter must be function");
         }
-        (data as any)[setterKey]((state: any) => {
-          if (debug) {
-            console.log(
-              `%c ${useFunc.name || "Unknown Service"} - ${setterKey} set`,
-              `color:white;background:#3f51b5`
-            );
-            console.log(value);
-          }
-          return setTargetByKey(state, keys.join("."), value);
-        });
+        if (debug) {
+          console.log(
+            `%c ${useFunc.name || "Unknown Service"} - ${setterKey} set`,
+            `color:white;background:#009688`
+          );
+          console.log(value);
+        }
+        (data as any)[setterKey]((state: any) =>
+          setTargetByKey(state, keys.join("."), value)
+        );
       },
       [data]
     );
-    return { data, get, set };
+    const call = useCallback(
+      (key: string, ...params: any[]) => {
+        if (debug) {
+          console.log(
+            `%c call ${useFunc.name || "Unknown Service"} - ${key}`,
+            `color:white;background:#2196F3`
+          );
+          console.log(params);
+        }
+        return (data as any)[key](...params);
+      },
+      [data]
+    );
+    return { data, get, set, call };
   };
   return { connect, useInject, ServiceContext, useService };
 }

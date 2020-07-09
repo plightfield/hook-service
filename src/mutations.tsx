@@ -45,6 +45,13 @@ export function setTargetByKey(obj: any, key: string, value: any) {
   if (Object.prototype.toString.call(key) !== "[object String]") {
     throw new Error("key must be string");
   } else {
-    return setTarget(obj, key.split("."), value);
+    const currentValue = getTargetByKey(obj, key);
+    // set while defferent
+    if (currentValue !== value) {
+      const newObj = Object.create(null);
+      return Object.assign(newObj, setTarget(obj, key.split("."), value));
+    } else {
+      return obj;
+    }
   }
 }
