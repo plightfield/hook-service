@@ -1,0 +1,27 @@
+{
+  "name": "hook-service",
+  "version": "1.3.6",
+  "main": "lib/index.js",
+  "description": "handle logic in one place just use hooks",
+  "keywords": [
+    "React",
+    "hooks",
+    "Context",
+    "typescript",
+    "service",
+    "module"
+  ],
+  "private": false,
+  "author": "plightfield",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.41",
+    "typescript": "^3.9.6"
+  }
+}
