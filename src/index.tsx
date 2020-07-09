@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import { getTargetByKey, setTargetByKey } from "./mutations";
 
@@ -17,7 +18,7 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
     useEffect(() => {
       if (debug) {
         console.log(
-          `%c ${useFunc.name || "Unknown Service"}`,
+          `%c ${useFunc.name || "Unknown Service"} `,
           `color:white;background:#3f51b5`
         );
         console.log(value);
@@ -58,7 +59,7 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
         }
         if (debug) {
           console.log(
-            `%c ${useFunc.name || "Unknown Service"} - ${setterKey} set`,
+            `%c set ${useFunc.name || "Unknown Service"} - ${setterKey} `,
             `color:white;background:#009688`
           );
           console.log(value);
@@ -73,7 +74,7 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
       (key: string, ...params: any[]) => {
         if (debug) {
           console.log(
-            `%c call ${useFunc.name || "Unknown Service"} - ${key}`,
+            `%c call ${useFunc.name || "Unknown Service"} - ${key} `,
             `color:white;background:#2196F3`
           );
           console.log(params);
