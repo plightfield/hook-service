@@ -1,6 +1,6 @@
 # hook-service
 
-> use hooks with Context by just one function
+> handle logic with only ONE function 
 
 ## Typescript
 
@@ -26,4 +26,4 @@ function SomeComponent() {
 export default SomeService.connect(SomeComponent);
 ```
 
-So you can see, there is no need to declare any Type annotations while using hook-service
+As you can see, there is no need to declare any Type annotations while using hook-service
