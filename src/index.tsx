@@ -12,7 +12,7 @@ export default function createService<T>(useFunc: () => T, debug?: boolean) {
   const nullUseFunc: T = null as any;
   const ServiceContext = createContext(nullUseFunc)!;
   ServiceContext.displayName = (useFunc.name || "UnknownService") + "👇";
-  const connect = (Component: FC) => (props: any) => {
+  const connect = <P extends Record<string, any>>(Component: FC<P>) => (props: P) => {
     const value = (useFunc as any)();
     // value log
     useEffect(() => {
