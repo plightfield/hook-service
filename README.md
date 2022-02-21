@@ -1,104 +1,116 @@
 # hook-service
 
-> handle logic with only ONE function
+> handle logic with five functions in react hooks
 
 ## Principle
 
 > React's api is enough for most situations
-> state management should just handle assitant jobs
-> use React's api instead of create some new
+> Must have way to handle event dispatch, especially when dispatch event form parent to child
 
-React has `useReducer`, `useState`, `useRef` etc. hooks apis.
-
-You don't need another state system at all.
-
-Just `createService` will give you enough capability to handle all states,
-and easilly expand it to a whole new level.
-
-## Typescript
+## useBind
 
 ```typescript
-import React, { useState } from "react";
-import createService from "hook-service";
+import { useBind } from 'hook-service';
 
-// service's delcaration
-const SomeService = createService(() => ({
-  nameHook: useState(""),
-}));
+function useSome(name: string, password: string) {
+  const bindRef = useBind(() => ({ name, password }));
+  const test = useCallback(() => {
+    // bindRef will take no changes in useCallback or useEffect
+    console.log(bindRef.current.name, bindRef.current.password);
+  }, [bindRef]);
+}
+```
+
+## createService
+
+```typescript
+import React, { useState } from 'react';
+import { createService } from 'hook-service';
+
+function useSome(name: string) {
+  const [state, setState] = useState(name);
+  return {
+    state,
+    setState,
+  };
+}
+
+// transform hook to service
+const SomeService = createService(useSome);
 
 function SomeComponent() {
   // service injected
-  const {
-    nameHook: [name, setName],
-  } = SomeService.useInject();
+  const { state, setState } = SomeService.useInject();
 
-  return <div>name from service: {name}</div>;
+  return <div>name from service: {state}</div>;
 }
 
 // service provided
-export default SomeService.connect(SomeComponent);
+<SomeService.Provider deps={['new name']}>
+  <SomeComponent />
+</SomeService.Provider>;
 ```
 
-As you can see, there is no need to declare any Type annotations while using hook-service
-
-## Service
-
-createService need two params, first a custom hook, return the value you want to use across components.
-
-the second one is optional, while set true, it will print the service state.
-
-> and alse print getter，setter，caller when using useService.
-
-all the formation of return will be accepted:
+## useAsync
 
 ```typescript
-const SomseService = createService(function CustomHook() {
-  return useState("");
-});
-```
+import { useAsync } from 'hook-service';
 
-or
-
-```typescript
-const SomseService = createService(function CustomHook() {
-  const [value] = useState("");
-  return value;
-});
-```
-
-> anonymous custom hooks is not recommended, hook-service determine the Service name by the custom
-> hook function name, and print it at the react dev tool.
-
-## useInject
-
-You can simply get the service data by Service.useInject() hook.
-
-```typescript
-import Service from "./service";
-
-function SomeComponent() {
-  const service = Service.useInject();
-  return <div />;
+function useTest() {
+  // loading will set after all content fulfilled or caught
+  const { trigger, result, loading } = useAsync(
+    () => fetch('http://some.com'),
+    (res) => {
+      // on fulfilled
+    },
+    (err) => {
+      // on error caught
+    },
+  );
 }
 ```
 
-## useService
-
-You can handle the Service in a flux like, predictable way, by less of type difinition support.
+## next & useListen
 
 ```typescript
-import Service from "./service";
+import { next, useListen } from 'hook-service';
 
-function SomeComponent() {
-  const service = Service.useService();
-  service.data; // the data of service
-  service.get("a.b.c"); // the deep data of service
-  service.set("setter.a.b.c", "some value"); // set the data of setter
-  service.call("callback/dispatch", "some value"); // call the call back or the dispatch function of service
-  return <div />;
+interface CustomEvent {
+  changeName: string;
+  changePassword: string;
+  setDisabled: boolean;
+}
+
+function useSome() {
+  const [name, setName] = useState('');
+  const [disabled, setDisabled] = useState(false);
+  useListen(
+    'someEventKey',
+    {
+      changeName(res) {
+        setName(res);
+      },
+      setDisabled(res) {
+        setDisabled(res);
+      },
+    },
+    // parent.window  // also listen custom event from iframe layers above
+  );
+  return (
+    <input
+      value={name}
+      onChange={(e) => {
+        setName(e.target.value);
+        next<CustomEvent>('someEventKey', 'changeName', e.target.value);
+        // this will dispatch event across iframe layers
+        next<CustomEvent>(
+          'someEventKey',
+          'changeName',
+          e.target.value,
+          parent.window,
+        );
+      }}
+    />
+  );
 }
 ```
-
-> You can only use it while the return value of Service was in { value, setvalue, dispatch, callback , ...} form
-
-Set the second value of createService to true, hook-service will print all the actions.
