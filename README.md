@@ -101,9 +101,13 @@ function useSome() {
       value={name}
       onChange={(e) => {
         setName(e.target.value);
-        next<CustomEvent>('someEventKey', 'changeName', e.target.value);
+        next<CustomEvent, 'changeName'>(
+          'someEventKey',
+          'changeName',
+          e.target.value,
+        );
         // this will dispatch event across iframe layers
-        next<CustomEvent>(
+        next<CustomEvent, 'changeName'>(
           'someEventKey',
           'changeName',
           e.target.value,
