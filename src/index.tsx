@@ -265,7 +265,7 @@ export function getStorage<T extends CanStore>(
   throw new Error('get storage error');
 }
 
-export default function useStorage<T extends CanStore>(
+export function useStorage<T extends CanStore>(
   key: string,
   initialValue: T | (() => T),
 ) {

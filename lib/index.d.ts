@@ -73,5 +73,5 @@ declare type CanStore = string | number | any[] | {
 } | null;
 export declare function setStorage<T extends CanStore>(key: string, val: T): void;
 export declare function getStorage<T extends CanStore>(key: string, initialValue: T): T;
-export default function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T)): readonly [T, React.Dispatch<React.SetStateAction<T>>];
+export declare function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T)): readonly [T, React.Dispatch<React.SetStateAction<T>>];
 export {};
