@@ -114,3 +114,21 @@ function useSome() {
   );
 }
 ```
+
+## getStorage & setStorage & useStorage
+
+```typescript
+// support string / number(int or float) / array / object
+import { getStorage, setStorage, useStorage } from 'hook-service';
+
+const name = getStorage('name', '');
+setStorage('name', 'new name');
+
+function useSome() {
+  const [name, setName] = useStorage('name', '');
+  const [config, setConfig] = useStorage('config', () => ({
+    name: '',
+    password: '',
+  }));
+}
+```

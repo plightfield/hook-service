@@ -68,3 +68,10 @@ export declare function useListen<E extends {
 }>(name: string | undefined, config: {
     [key in keyof E]?: (val: E[key]) => void;
 }, parent?: Window): void;
+declare type CanStore = string | number | any[] | {
+    [key: string]: any;
+} | null;
+export declare function setStorage<T extends CanStore>(key: string, val: T): void;
+export declare function getStorage<T extends CanStore>(key: string, initialValue: T): T;
+export default function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T)): readonly [T, React.Dispatch<React.SetStateAction<T>>];
+export {};

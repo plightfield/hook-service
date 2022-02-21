@@ -203,3 +203,81 @@ export function useListen<E extends { [key: string]: any }>(
     };
   }, [name, parent, configRef]);
 }
+
+// only support string / number(int or float) / array / object
+type CanStore = string | number | any[] | { [key: string]: any } | null;
+
+function checkCanJsonParse<T>(value: T) {
+  const typeStr = Object.prototype.toString.call(value);
+  if (
+    value === null ||
+    typeStr === '[object Object]' ||
+    typeStr === '[object Array]'
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function isFloat(val: number) {
+  if (val.toString().indexOf('.') >= 0) {
+    return true;
+  }
+  return false;
+}
+
+export function setStorage<T extends CanStore>(key: string, val: T) {
+  let stored: string = '';
+  if (checkCanJsonParse(val)) {
+    stored = JSON.stringify(val);
+  } else if (typeof val === 'number') {
+    stored = val.toString();
+  } else if (typeof val === 'string') {
+    stored = val;
+  } else {
+    throw new Error('set storage error');
+  }
+  localStorage.setItem(key, stored);
+}
+
+export function getStorage<T extends CanStore>(
+  key: string,
+  initialValue: T,
+): T {
+  const stored = localStorage.getItem(key);
+  if (stored === null) return initialValue;
+  if (checkCanJsonParse(initialValue)) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return initialValue;
+    }
+  }
+  if (typeof initialValue === 'number') {
+    if (isFloat(initialValue)) {
+      return parseFloat(stored) as any;
+    }
+    return parseInt(stored, 10) as any;
+  }
+  if (typeof initialValue === 'string') {
+    return stored as any;
+  }
+  throw new Error('get storage error');
+}
+
+export default function useStorage<T extends CanStore>(
+  key: string,
+  initialValue: T | (() => T),
+) {
+  const [state, setState] = useState(() => {
+    const usedInitial: T =
+      typeof initialValue === 'function'
+        ? (initialValue as any)()
+        : (initialValue as any);
+    return getStorage(key, usedInitial);
+  });
+  useEffect(() => {
+    setStorage(key, state);
+  }, [state, key]);
+  return [state, setState] as const;
+}
