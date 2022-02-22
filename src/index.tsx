@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  Dispatch,
   PropsWithChildren,
   useCallback,
   useContext,
@@ -23,6 +24,25 @@ export function useBind<T>(compute: () => T) {
     result.current = compute();
   });
   return result;
+}
+
+/**
+ * callback with none dependency
+ *
+ * @export
+ * @template P
+ * @template R
+ * @param {(...args: P) => R} cb
+ * @return {*}
+ */
+export function useCb<P extends any[], R>(cb: (...args: P) => R) {
+  const cbRef = useBind(() => cb);
+  return useCallback(
+    (args: P) => {
+      cbRef.current(...args);
+    },
+    [cbRef],
+  ) as Dispatch<P>;
 }
 
 /**
@@ -226,7 +246,20 @@ function isFloat(val: number) {
   return false;
 }
 
-export function setStorage<T extends CanStore>(key: string, val: T) {
+/**
+ * set storage value
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {T} val
+ * @param {Storage} [handler=localStorage]
+ */
+export function setStorage<T extends CanStore>(
+  key: string,
+  val: T,
+  handler: Storage = localStorage,
+) {
   let stored: string = '';
   if (checkCanJsonParse(val)) {
     stored = JSON.stringify(val);
@@ -237,14 +270,25 @@ export function setStorage<T extends CanStore>(key: string, val: T) {
   } else {
     throw new Error('set storage error');
   }
-  localStorage.setItem(key, stored);
+  handler.setItem(key, stored);
 }
 
+/**
+ * get storage value
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {T} initialValue
+ * @param {Storage} [handler=localStorage]
+ * @return {*}  {T}
+ */
 export function getStorage<T extends CanStore>(
   key: string,
   initialValue: T,
+  handler: Storage = localStorage,
 ): T {
-  const stored = localStorage.getItem(key);
+  const stored = handler.getItem(key);
   if (stored === null) return initialValue;
   if (checkCanJsonParse(initialValue)) {
     try {
@@ -265,19 +309,30 @@ export function getStorage<T extends CanStore>(
   throw new Error('get storage error');
 }
 
+/**
+ * storage using hook
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {(T | (() => T))} initialValue
+ * @param {Storage} [handler=localStorage]
+ * @return {*}
+ */
 export function useStorage<T extends CanStore>(
   key: string,
   initialValue: T | (() => T),
+  handler: Storage = localStorage,
 ) {
   const [state, setState] = useState(() => {
     const usedInitial: T =
       typeof initialValue === 'function'
         ? (initialValue as any)()
         : (initialValue as any);
-    return getStorage(key, usedInitial);
+    return getStorage(key, usedInitial, handler);
   });
   useEffect(() => {
-    setStorage(key, state);
+    setStorage(key, state, handler);
   }, [state, key]);
   return [state, setState] as const;
 }

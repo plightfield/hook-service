@@ -7,10 +7,10 @@
 > React's api is enough for most situations
 > Must have way to handle event dispatch, especially when dispatch event form parent to child
 
-## useBind
+## useBind/useCb
 
 ```typescript
-import { useBind } from 'hook-service';
+import { useBind, useCb } from 'hook-service';
 
 function useSome(name: string, password: string) {
   const bindRef = useBind(() => ({ name, password }));
@@ -18,6 +18,11 @@ function useSome(name: string, password: string) {
     // bindRef will take no changes in useCallback or useEffect
     console.log(bindRef.current.name, bindRef.current.password);
   }, [bindRef]);
+
+  const immutableTest = useCb(() => {
+    // callback never change
+    console.log(name, password);
+  });
 }
 ```
 
@@ -126,7 +131,10 @@ function useSome() {
 import { getStorage, setStorage, useStorage } from 'hook-service';
 
 const name = getStorage('name', '');
-setStorage('name', 'new name');
+// third param identified which storage in use
+// can be used in getStorage/setStorage/useStorage
+// localStorage by default
+setStorage('name', 'new name', sessionStorage);
 
 function useSome() {
   const [name, setName] = useStorage('name', '');

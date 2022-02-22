@@ -9,6 +9,16 @@ import React, { PropsWithChildren } from 'react';
  */
 export declare function useBind<T>(compute: () => T): React.MutableRefObject<T>;
 /**
+ * callback with none dependency
+ *
+ * @export
+ * @template P
+ * @template R
+ * @param {(...args: P) => R} cb
+ * @return {*}
+ */
+export declare function useCb<P extends any[], R>(cb: (...args: P) => R): React.Dispatch<P>;
+/**
  * create a service by custom hook function
  *
  * @export
@@ -71,7 +81,36 @@ export declare function useListen<E extends {
 declare type CanStore = string | number | any[] | {
     [key: string]: any;
 } | null;
-export declare function setStorage<T extends CanStore>(key: string, val: T): void;
-export declare function getStorage<T extends CanStore>(key: string, initialValue: T): T;
-export declare function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T)): readonly [T, React.Dispatch<React.SetStateAction<T>>];
+/**
+ * set storage value
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {T} val
+ * @param {Storage} [handler=localStorage]
+ */
+export declare function setStorage<T extends CanStore>(key: string, val: T, handler?: Storage): void;
+/**
+ * get storage value
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {T} initialValue
+ * @param {Storage} [handler=localStorage]
+ * @return {*}  {T}
+ */
+export declare function getStorage<T extends CanStore>(key: string, initialValue: T, handler?: Storage): T;
+/**
+ * storage using hook
+ *
+ * @export
+ * @template T
+ * @param {string} key
+ * @param {(T | (() => T))} initialValue
+ * @param {Storage} [handler=localStorage]
+ * @return {*}
+ */
+export declare function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T), handler?: Storage): readonly [T, React.Dispatch<React.SetStateAction<T>>];
 export {};
