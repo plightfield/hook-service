@@ -81,17 +81,20 @@ export function createService<P extends any[], R>(useFunc: (...args: P) => R) {
 /**
  * event edge trigger with loading state
  *
+ * @export
  * @template P
  * @template R
- * @param {(...args: P) => Promise<R>} func
+ * @param {(...args: P) => Promise<any>} func
  * @param {(err: Error) => void} [errCb]
  * @param {(val: R) => void} [cb]
+ * @param {(val: any) => R} [transform=(res) => res]
  * @return {*}
  */
 export function useAsync<P extends any[], R>(
-  func: (...args: P) => Promise<R>,
+  func: (...args: P) => Promise<any>,
   errCb?: (err: Error) => void,
   cb?: (val: R) => void,
+  transform: (val: any) => R = (res) => res,
 ) {
   const configRef = useBind(() => ({
     func,
@@ -125,13 +128,14 @@ export function useAsync<P extends any[], R>(
           };
         });
       };
-      const handle = (res: R) => {
+      const handle = (res: any) => {
+        const result = transform(res);
         setResult((el) => {
-          el.value.set(key, res);
+          el.value.set(key, result);
           return { value: el.value };
         });
         deletePending(key);
-        configRef.current.cb?.(res);
+        configRef.current.cb?.(result);
       };
       const errHandle = (err: Error) => {
         deletePending(key);
@@ -142,7 +146,7 @@ export function useAsync<P extends any[], R>(
         .then(handle)
         .catch(errHandle);
     },
-    [configRef],
+    [configRef, transform],
   );
   const loading = useMemo(() => pending.value.size > 0, [pending]);
   const usedResult = useMemo(() => {

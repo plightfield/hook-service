@@ -36,14 +36,16 @@ export declare function createService<P extends any[], R>(useFunc: (...args: P) 
 /**
  * event edge trigger with loading state
  *
+ * @export
  * @template P
  * @template R
- * @param {(...args: P) => Promise<R>} func
+ * @param {(...args: P) => Promise<any>} func
  * @param {(err: Error) => void} [errCb]
  * @param {(val: R) => void} [cb]
+ * @param {(val: any) => R} [transform=(res) => res]
  * @return {*}
  */
-export declare function useAsync<P extends any[], R>(func: (...args: P) => Promise<R>, errCb?: (err: Error) => void, cb?: (val: R) => void): {
+export declare function useAsync<P extends any[], R>(func: (...args: P) => Promise<any>, errCb?: (err: Error) => void, cb?: (val: R) => void, transform?: (val: any) => R): {
     trigger: (...args: P) => void;
     loading: boolean;
     result: R | undefined;
