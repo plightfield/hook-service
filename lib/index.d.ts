@@ -115,4 +115,13 @@ export declare function getStorage<T extends CanStore>(key: string, initialValue
  * @return {*}
  */
 export declare function useStorage<T extends CanStore>(key: string, initialValue: T | (() => T), handler?: Storage): readonly [T, React.Dispatch<React.SetStateAction<T>>];
+/**
+ * defer value change after certain time
+ *
+ * @template T
+ * @param {T} val
+ * @param {number} [defer=0]
+ * @return {*}
+ */
+export declare function useDeferValue<T>(val: T, defer?: number): T;
 export {};

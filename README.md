@@ -1,6 +1,6 @@
 # hook-service
 
-> handle logic with five functions in react hooks
+> handle logic with few functions in react hooks
 
 ## Principle
 
@@ -142,5 +142,17 @@ function useSome() {
     name: '',
     password: '',
   }));
+}
+```
+
+## useDeferValue
+
+```typescript
+import { useDeferValue } from 'hook-service';
+
+function useSome() {
+  const [state, setState] = useState('');
+  // new state change after state after certain time
+  const deferState = useDeferValue(state, 100);
 }
 ```

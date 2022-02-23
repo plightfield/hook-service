@@ -340,3 +340,32 @@ export function useStorage<T extends CanStore>(
   }, [state, key]);
   return [state, setState] as const;
 }
+
+/**
+ * defer value change after certain time
+ *
+ * @template T
+ * @param {T} val
+ * @param {number} [defer=0]
+ * @return {*}
+ */
+export function useDeferValue<T>(val: T, defer: number = 0) {
+  const [result, setResult] = useState(val);
+  const end = useRef(false);
+  useEffect(() => {
+    return () => {
+      end.current = true;
+    };
+  }, []);
+  useEffect(() => {
+    const handle = () => {
+      if (end.current) return;
+      setResult(val);
+    };
+    const timeout = setTimeout(handle, defer);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [val, defer]);
+  return result;
+}
