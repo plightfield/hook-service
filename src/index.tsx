@@ -100,6 +100,7 @@ export function useAsync<P extends any[], R>(
     func,
     cb,
     errCb,
+    transform,
   }));
   const [pending, setPending] = useState(() => ({
     value: new Set<symbol>(),
@@ -129,7 +130,7 @@ export function useAsync<P extends any[], R>(
         });
       };
       const handle = (res: any) => {
-        const result = transform(res);
+        const result = configRef.current.transform(res);
         setResult((el) => {
           el.value.set(key, result);
           return { value: el.value };
@@ -146,7 +147,7 @@ export function useAsync<P extends any[], R>(
         .then(handle)
         .catch(errHandle);
     },
-    [configRef, transform],
+    [configRef],
   );
   const loading = useMemo(() => pending.value.size > 0, [pending]);
   const usedResult = useMemo(() => {
